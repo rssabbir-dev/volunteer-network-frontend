@@ -28,7 +28,7 @@ const Registration = () => {
 			})
 			.catch((err) => {
 				console.log(err);
-				toast.error(err);
+				toast.error(err.message);
 			});
 	};
 
@@ -40,7 +40,7 @@ const Registration = () => {
 				);
 			})
 			.catch((err) => {
-				toast.error(err);
+				toast.error(err.message);
 			});
 	};
 

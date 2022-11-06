@@ -5,11 +5,27 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import sideImg from '../../assets/images/extraVolunteer.png';
 import { AuthContext } from '../../context/AuthProvider/AuthProvider';
 
+export const handleJWT = (user) => {
+	const currentUser = {
+		uid: user.uid,
+	};
+	fetch('http://localhost:5000/jwt', {
+		method: 'POST',
+		headers: {
+			'content-type': 'application/json',
+		},
+		body: JSON.stringify(currentUser),
+	})
+		.then((res) => res.json())
+		.then((data) => {
+			localStorage.setItem('volunteer-token', data.token);
+		});
+};
 const Login = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const from = location?.state?.from?.pathname || '/';
-	const { loginUser } = useContext(AuthContext);
+	const { loginUser,setLoading } = useContext(AuthContext);
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		const form = event.target;
@@ -25,14 +41,20 @@ const Login = () => {
 					toast.error('Verify Email Before login');
 				} else {
 					toast.success('Login Success');
+					handleJWT(user);
 					navigate(from, { replace: true });
 				}
 			})
 			.catch((err) => {
 				console.log(err);
-				toast.error(err);
-			});
+				toast.error(err.message);
+			})
+			.finally(() => {
+				setLoading(false)
+			})
 	};
+
+	
 	return (
 		<div className='space-y-5'>
 			<div className='grid place-content-center'>
@@ -68,12 +90,12 @@ const Login = () => {
 									className='input input-bordered'
 								/>
 								<label className='label'>
-									<a
-										href='#'
+									<Link
+										to='/'
 										className='label-text-alt link link-hover'
 									>
 										Forgot password?
-									</a>
+									</Link>
 								</label>
 							</div>
 							<div className='form-control mt-6'>
